@@ -1,0 +1,3 @@
+
+class TransaqException(Exception):
+    pass
