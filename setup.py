@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='transaqpy',
-    packages=find_packages(include=['transaqpy',]),
+    packages=find_packages(),
     version='0.1.0',
     description='Transaq connector integration for python',
     author='Andrey Tkachenko',
