@@ -41,7 +41,7 @@ class TransaqClient:
     _can_disconnect = False
     _connector_initialized = False
 
-    def __init__(self, message_handler: Callable, connector: Type[TransaqConnector] = None):
+    def __init__(self, message_handler: Callable, connector: TransaqConnector = None):
         self._connector = connector
         self._connector.callback = self.handle_message
         self._handler = message_handler
