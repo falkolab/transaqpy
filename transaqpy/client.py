@@ -112,6 +112,8 @@ class TransaqClient:
         response = self.send_command(
             CommandMaker("disconnect")
         )
+        if not response.success:
+            logger.warning("Can't disconnect because: %s", response.text)
         self._can_disconnect = not response.success
         self._connected_blocker = not response.success
         return response.success

@@ -8,7 +8,7 @@ from eulxml.xmlmap import parseString, XmlObject, load_xmlobject_from_string, \
 from eulxml.xmlmap.fields import Field, DateTimeMapper
 
 from transaqpy.commands import Ticker, BuySellAction
-from transaqpy.utils import TRANSAQ_TIME_FORMAT
+from transaqpy.utils import TRANSAQ_DATETIME_FORMAT, TRANSAQ_TIME_FORMAT
 
 try:
     from enum import StrEnum
@@ -170,7 +170,7 @@ class HistoryCandle(Entity):
     Свечки OHLCV (open,high,low,close).
     """
     ROOT_NAME = 'candle'
-    date = DateTimeField('@date', TRANSAQ_TIME_FORMAT)
+    date = DateTimeField('@date', TRANSAQ_DATETIME_FORMAT)
     id = hash(date)
     open = FloatField('@open')
     high = FloatField('@high')
@@ -386,7 +386,7 @@ class SecInfo(Entity):
     # Единицы измерения цены
     pname = StringField('pname')
     # Дата погашения
-    mat_date = DateTimeField('mat_date', TRANSAQ_TIME_FORMAT)
+    mat_date = DateTimeField('mat_date', TRANSAQ_DATETIME_FORMAT)
     # Цена последнего клиринга (только FORTS)
     clearing_price = FloatField('clearing_price')
     # Минимальная цена (только FORTS)
@@ -406,7 +406,7 @@ class SecInfo(Entity):
     # Размер купона, руб
     coupon_value = FloatField('coupon_value')
     # Дата погашения купона
-    coupon_date = DateTimeField('coupon_date', TRANSAQ_TIME_FORMAT)
+    coupon_date = DateTimeField('coupon_date', TRANSAQ_DATETIME_FORMAT)
     # Период выплаты купона, дни
     coupon_period = IntegerField('coupon_period')
     # Номинал облигации или акции, руб
@@ -492,7 +492,7 @@ class Quotation(Entity):
     # Цена последней сделки
     last_price = FloatField('last')
     # Время заключения последней сделки
-    last_time = DateTimeField('time', TRANSAQ_TIME_FORMAT)
+    last_time = DateTimeField('time', TRANSAQ_DATETIME_FORMAT)
     # Объем последней сделки, в лотах
     last_quantity = IntegerField('quantity')
     # Изменение цены последней сделки по отношению к цене
@@ -555,7 +555,7 @@ class Trade(Entity):
     # Биржевой номер сделки
     id = trade_no = IntegerField('tradeno')
     # Время сделки
-    time = DateTimeField('time', TRANSAQ_TIME_FORMAT)
+    time = DateTimeField('time', TRANSAQ_DATETIME_FORMAT)
     # Цена сделки
     price = FloatField('price')
     # Объём в лотах
@@ -656,11 +656,11 @@ class BaseOrder(Entity):
     # Покупка (B) / Продажа (S)
     _buysell = StringField('buysell', choices=('B', 'S'))
     # Дата экспирации (только для ФОРТС)
-    exp_date = DateTimeField('expdate', TRANSAQ_TIME_FORMAT)
+    exp_date = DateTimeField('expdate', TRANSAQ_DATETIME_FORMAT)
     # Время регистрации заявки сервером Transaq (только для условных заявок)
-    accept_time = DateTimeField('accepttime', TRANSAQ_TIME_FORMAT)
+    accept_time = DateTimeField('accepttime', TRANSAQ_DATETIME_FORMAT)
     # До какого момента действительно
-    valid_before = DateTimeField('validbefore', TRANSAQ_TIME_FORMAT)
+    valid_before = DateTimeField('validbefore', TRANSAQ_DATETIME_FORMAT)
 
     @property
     def status(self):
@@ -683,7 +683,7 @@ class Order(BaseOrder):
     # Цена
     price = FloatField('price')
     # Время регистрации заявки биржей
-    time = DateTimeField('time', TRANSAQ_TIME_FORMAT)
+    time = DateTimeField('time', TRANSAQ_DATETIME_FORMAT)
     # Примечание
     broker_ref = StringField('brokerref')
     # Биржевой номер заявки
@@ -707,12 +707,12 @@ class Order(BaseOrder):
     # Цена для условной заявки, либо обеспеченность в процентах
     condition_value = FloatField('conditionvalue')
     # С какого момента времени действительна
-    valid_after = DateTimeField('valid_after', TRANSAQ_TIME_FORMAT)
+    valid_after = DateTimeField('valid_after', TRANSAQ_DATETIME_FORMAT)
     # Максимальная комиссия по сделкам заявки
     max_commission = FloatField('maxcomission')
     # Время снятия заявки, 0 для активных
-    withdraw_time = DateTimeField('withdrawtime', TRANSAQ_TIME_FORMAT)
-    withdraw_time.mapper = NullableDateTimeMapper(TRANSAQ_TIME_FORMAT)
+    withdraw_time = DateTimeField('withdrawtime', TRANSAQ_DATETIME_FORMAT)
+    withdraw_time.mapper = NullableDateTimeMapper(TRANSAQ_DATETIME_FORMAT)
     # Сообщение биржи в случае отказа выставить заявку
     result = StringField('result')
 
@@ -746,15 +746,15 @@ class StopOrder(BaseOrder):
     # явившейся основанием для перехода стопа в текущее состояние
     alltrade_no = IntegerField('alltradeno')
     # До какого момента действительно
-    valid_before = DateTimeField('validbefore', TRANSAQ_TIME_FORMAT)
+    valid_before = DateTimeField('validbefore', TRANSAQ_DATETIME_FORMAT)
     # Афтар заявки
     author = StringField('author')
     # Привязка к стандартной заявке
     linked_order_no = IntegerField('linkedorderno')
     # Время регистрации заявки сервером Transaq (только для условных заявок)
-    accept_time = DateTimeField('accepttime', TRANSAQ_TIME_FORMAT)
+    accept_time = DateTimeField('accepttime', TRANSAQ_DATETIME_FORMAT)
     # Дата экспирации (только для ФОРТС)
-    exp_date = DateTimeField('expdate', TRANSAQ_TIME_FORMAT)
+    exp_date = DateTimeField('expdate', TRANSAQ_DATETIME_FORMAT)
 
     class _StopLoss(TransaqMessage):
         """Стоп лосс оредер секция"""
@@ -767,7 +767,7 @@ class StopOrder(BaseOrder):
         # Защитное время удержания цены
         # (когда цены на рынке лишь кратковременно достигают уровня цены активации,
         # и вскоре возвращаются обратно)
-        guard_time = DateTimeField('guardtime', TRANSAQ_TIME_FORMAT)
+        guard_time = DateTimeField('guardtime', TRANSAQ_DATETIME_FORMAT)
         # Примечание
         broker_ref = StringField('brokerref')
         # Количество лотов
@@ -784,7 +784,7 @@ class StopOrder(BaseOrder):
         # Защитное время удержания цены
         # (когда цены на рынке лишь кратковременно достигают уровня цены активации,
         # и вскоре возвращаются обратно)
-        guard_time = DateTimeField('takeprofit/guardtime', TRANSAQ_TIME_FORMAT)
+        guard_time = DateTimeField('takeprofit/guardtime', TRANSAQ_DATETIME_FORMAT)
         # Достигнутый максимум
         extremum = FloatField('takeprofit/extremum')
         # Уровень исполнения?
@@ -847,7 +847,7 @@ class ClientTrade(Entity):
     # B - покупка, S - продажа
     buysell = StringField('buysell', choices=('B', 'S'))
     # Время сделки
-    time = DateTimeField('time', TRANSAQ_TIME_FORMAT)
+    time = DateTimeField('time', TRANSAQ_DATETIME_FORMAT)
     # Примечание
     broker_ref = StringField('brokerref')
     # Объем сделки
@@ -1277,7 +1277,7 @@ class HistoryTick(Trade):
     """
     ROOT_NAME = 'tick'
     secid = IntegerField('secid')
-    time = DateTimeField('tradetime', TRANSAQ_TIME_FORMAT)
+    time = DateTimeField('tradetime', TRANSAQ_DATETIME_FORMAT)
 
 
 class HistoryTickPacket(Packet):
@@ -1424,7 +1424,7 @@ class NewsHeader(TransaqMessage):
     """
     ROOT_NAME = 'news_header'
     id = IntegerField('id')
-    time = DateTimeField('timestamp', TRANSAQ_TIME_FORMAT)
+    time = DateTimeField('timestamp', TRANSAQ_DATETIME_FORMAT)
     source = StringField('source')
     title = StringField('title')
 

@@ -4,7 +4,7 @@ from typing import List, Union, Literal, Optional
 from datetime import datetime, timedelta
 
 from transaqpy import TransaqException
-from transaqpy.utils import CommandMaker, TRANSAQ_TIME_FORMAT
+from transaqpy.utils import CommandMaker, TRANSAQ_DATETIME_FORMAT
 
 try:
     from enum import StrEnum
@@ -240,11 +240,11 @@ def new_sl_tp_order(
         mk.add('linkedorderno', str(linkedorderno))
     if validfor is not None:
         if isinstance(validfor, datetime):
-            mk.add('validfor', validfor.strftime(TRANSAQ_TIME_FORMAT))
+            mk.add('validfor', validfor.strftime(TRANSAQ_DATETIME_FORMAT))
         else:
             mk.add('validfor', str(validfor))
     if expdate:
-        mk.add('expdate', expdate.strftime(TRANSAQ_TIME_FORMAT))
+        mk.add('expdate', expdate.strftime(TRANSAQ_DATETIME_FORMAT))
 
     if sl_quantity:
         sl = CommandMaker(tag='stoploss', parent=mk.root)
@@ -358,13 +358,13 @@ def new_conditional_order(ticker: Ticker, client: str, buysell: BuySellAction, q
 
     if valid_before is not None:
         if isinstance(valid_before, datetime):
-            mk.add('valid_before', valid_before.strftime(TRANSAQ_TIME_FORMAT))
+            mk.add('valid_before', valid_before.strftime(TRANSAQ_DATETIME_FORMAT))
         else:
             mk.add('valid_before', str(valid_before))
 
     if valid_after is not None:
         if isinstance(valid_after, datetime):
-            mk.add('valid_after', valid_after.strftime(TRANSAQ_TIME_FORMAT))
+            mk.add('valid_after', valid_after.strftime(TRANSAQ_DATETIME_FORMAT))
         else:
             mk.add('valid_after', str(valid_after))
 
@@ -376,12 +376,12 @@ def new_conditional_order(ticker: Ticker, client: str, buysell: BuySellAction, q
         mk.add('within_pos')
 
     if expdate is not None:
-        mk.add('expdate', expdate.strftime(TRANSAQ_TIME_FORMAT))
+        mk.add('expdate', expdate.strftime(TRANSAQ_DATETIME_FORMAT))
 
     mk.add('cond_type', cond_type.value)
     if cond_value is not None:
         if isinstance(cond_value, datetime):
-            mk.add('cond_value', cond_value.strftime(TRANSAQ_TIME_FORMAT))
+            mk.add('cond_value', cond_value.strftime(TRANSAQ_DATETIME_FORMAT))
         else:
             mk.add('cond_value', str(cond_value))
     return mk

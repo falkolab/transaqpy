@@ -5,7 +5,8 @@ from typing import Union, Optional
 import lxml.etree as et
 encoding = sys.stdout.encoding
 
-TRANSAQ_TIME_FORMAT = "%d.%m.%Y %H:%M:%S"
+TRANSAQ_DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
+TRANSAQ_TIME_FORMAT = "%H:%M:%S"
 
 
 class CommandMaker:
