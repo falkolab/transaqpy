@@ -469,3 +469,18 @@ def get_mc_portfolio(client: str = None, union: str = None,
     loc = locals()
     kw = {key: loc[key] for key in keys if loc[key] is not None}
     return CommandMaker('get_mc_portfolio', **kw)
+
+
+def get_max_buy_sell(client: str = None, union: str = None, tickers: List[Ticker] = []):
+    """
+    Получение информации о максимально возможных объемах заявок на покупку и на продажу по перечисленным бумагам для заданного клиента или юниона
+    :param client:
+    :param union:
+    :param tickers:
+    :return:
+    """
+    mk = CommandMaker('get_max_buy_sell', client=client, union=union)
+
+    for ticker in tickers:
+        mk.add('security', asdict(ticker))
+    return mk

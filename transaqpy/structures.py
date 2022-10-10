@@ -6,6 +6,7 @@ from eulxml.xmlmap import parseString, XmlObject, load_xmlobject_from_string, \
     StringField, FloatField, DateTimeField, IntegerField, SimpleBooleanField, \
     NodeListField, ItemField, IntegerListField, NodeField
 from eulxml.xmlmap.fields import Field, DateTimeMapper
+from lxml.etree import XMLSyntaxError
 
 from transaqpy.commands import Ticker, BuySellAction
 from transaqpy.utils import TRANSAQ_DATETIME_FORMAT, TRANSAQ_TIME_FORMAT
@@ -1123,129 +1124,6 @@ class ClientLimitsForts(Entity):
     collat_free = FloatField('collat_free')
 
 
-class ClientPortfolio(Entity):
-    """
-    Клиентский портфель Т+, основная рабочая структура для фондовой секции.
-    """
-    ROOT_NAME = 'portfolio_tplus'
-    # Идентификатор клиента
-    id = client = StringField('@client')
-    # Фактическая обеспеченность
-    coverage_fact = FloatField('coverage_fact')
-    # Плановая обеспеченность
-    coverage_plan = FloatField('coverage_plan')
-    # Критическая обеспеченность
-    coverage_crit = FloatField('coverage_crit')
-    # Входящая оценка портфеля без дисконта
-    open_equity = FloatField('open_equity')
-    # Текущая оценка портфеля без дисконта
-    equity = FloatField('equity')
-    # Плановое обеспечение (оценка ликвидационной стоимости портфеля)
-    cover = FloatField('cover')
-    # Плановая начальная маржа (оценка портфельного риска)
-    init_margin = FloatField('init_margin')
-    # Прибыль/убыток по входящим позициям
-    pnl_income = FloatField('pnl_income')
-    # Прибыль/убыток по сделкам
-    pnl_intraday = FloatField('pnl_intraday')
-    # Фактическое плечо портфеля Т+
-    leverage = FloatField('leverage')
-    # Фактический уровень маржи портфеля Т+
-    margin_level = FloatField('margin_level')
-
-    class _Money(TransaqMessage):
-        # Входящая денежная позиция
-        open_balance = FloatField('open_balance')
-        # Затрачено на покупки
-        bought = FloatField('bought')
-        # Выручено от продаж
-        sold = FloatField('sold')
-        # Исполнено
-        settled = FloatField('settled')
-        # Текущая денежная позиция
-        balance = FloatField('balance')
-        # Уплачено комиссии
-        tax = FloatField('tax')
-
-        class _ValuePart(TransaqMessage):
-            # Регистр учёта
-            register = StringField('@register')
-            # Входящая денежная позиция
-            open_balance = FloatField('open_balance')
-            # Потрачено на покупки
-            bought = FloatField('bought')
-            # Выручка от продаж
-            sold = FloatField('sold')
-            # Исполнено
-            settled = FloatField('settled')
-            # Текущая денежная позиция
-            balance = FloatField('balance')
-
-        value_parts = NodeListField('value_part', _ValuePart)
-
-    money = NodeField('money', _Money)
-
-    class _Security(TransaqMessage):
-        # Id инструмента
-        secid = IntegerField('@secid')
-        # Id рынка
-        market = IntegerField('market')
-        # Обозначение инструмента
-        seccode = StringField('seccode')
-        # Текущая цена
-        price = FloatField('price')
-        # Входящая позиция, штук
-        open_balance = IntegerField('open_balance')
-        # Куплено, штук
-        bought = IntegerField('bought')
-        # Продано, штук
-        sold = IntegerField('sold')
-        # Текущая позиция, штук
-        balance = IntegerField('balance')
-        # Заявлено купить, штук
-        buying = IntegerField('buying')
-        # Заявлено продать, штук
-        selling = IntegerField('selling')
-        # Вклад бумаги в плановое обеспечение
-        cover = FloatField('cover')
-        # Плановая начальная маржа (риск)
-        init_margin = FloatField('init_margin')
-        # Cтавка риска для лонгов
-        riskrate_long = FloatField('riskrate_long')
-        # Cтавка риска для шортов
-        riskrate_short = FloatField('riskrate_short')
-        # Прибыль/убыток по входящим позициям
-        pnl_income = FloatField('pnl_income')
-        # Прибыль/убыток по сделкам
-        pnl_intraday = FloatField('pnl_intraday')
-        # Максимальная покупка, в лотах
-        max_buy = IntegerField('maxbuy')
-        # Макcимальная продажа, в лотах
-        max_sell = IntegerField('maxsell')
-
-        class _ValuePart(TransaqMessage):
-            # Входящая позиция, штук
-            register = StringField('@register')
-            # Входящая позиция, штук
-            open_balance = IntegerField('open_balance')
-            # Куплено, штук
-            bought = IntegerField('bought')
-            # Продано, штук
-            sold = IntegerField('sold')
-            # Исполнено
-            settled = IntegerField('settled')
-            # Текущая позиция, штук
-            balance = IntegerField('balance')
-            # Заявлено купить, штук
-            buying = IntegerField('buying')
-            # Заявлено продать, штук
-            selling = IntegerField('selling')
-
-        value_parts = NodeListField('value_part', _ValuePart)
-
-    securities = NodeListField('security', _Security)
-
-
 class CreditAbility(TransaqMessage):
     """
     Режим кредитования.
@@ -1437,6 +1315,30 @@ class NewsBody(TransaqMessage):
     id = IntegerField('id')
     text = StringField('text')
 
+class MaxBuySell(TransaqMessage):
+    """
+    Максимальная покупка/продажа
+    """
+    ROOT_NAME = 'max_buy_sell'
+    # Идентификатор клиента
+    id = client = StringField('@client')
+    # Код портфеля
+    union = StringField('@union')
+
+    class _Security(TransaqMessage):
+        # Id инструмента
+        secid = IntegerField('@secid')
+        # Id рынка
+        market = IntegerField('market')
+        # Обозначение инструмента
+        seccode = StringField('seccode')
+        # Максимум купить (лот.)
+        maxbuy = FloatField('maxbuy')
+        # Максимум продать (лот.)
+        maxsell = FloatField('maxsell')
+
+    securities = NodeListField('security', _Security)
+
 
 class MultiPortfolio(TransaqMessage):
     """
@@ -1588,7 +1490,7 @@ class MultiPortfolio(TransaqMessage):
 
     class _Security(TransaqMessage):
         # Id инструмента
-        secid = IntegerField('@secid')
+        id = secid = IntegerField('@secid')
         # Id рынка
         market = IntegerField('market')
         # Обозначение инструмента
@@ -1676,9 +1578,12 @@ def translate_to_object(xml) -> Optional[TransaqMessage]:
     :return:
         Распарсенный объект. None если не распознан.
     """
-    # print(xml)
-    klass = query_structure_by_root_tag(parseString(xml).tag)
-    return klass.parse(xml) if klass else None
+    try:
+        klass = query_structure_by_root_tag(parseString(xml).tag)
+        return klass.parse(xml) if klass else None
+    except XMLSyntaxError as e:
+        print(xml)
+        raise e
 
 
 def scan_module_for_structures(module_name):

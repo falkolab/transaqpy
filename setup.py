@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 setup(
     name='transaqpy',
     packages=find_packages(),
-    version='0.1.0',
+    version='0.1.1',
     description='Transaq connector integration for python',
     author='Andrey Tkachenko',
     author_email='falko.lab@gmail.com',
