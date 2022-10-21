@@ -266,33 +266,33 @@ def new_sl_tp_order(
             sl.add('guardtime', str(sl_guardtime))
 
     if tp_quantity:
-        sl = CommandMaker(tag='takeprofit', parent=mk.root)
+        tp = CommandMaker(tag='takeprofit', parent=mk.root)
         quantity: Union[int, str] = tp_quantity
         if quantity:
             if not isinstance(quantity, int):
                 _ensure_percentage(quantity)
-            sl.add('quantity', str(quantity))
-        sl.add('activationprice', str(tp_activationprice))
+            tp.add('quantity', str(quantity))
+        tp.add('activationprice', str(tp_activationprice))
         if tp_bymarket:
-            sl.add('bymarket')
+            tp.add('bymarket')
         if tp_usecredit:
-            sl.add('usecredit')
+            tp.add('usecredit')
         if tp_brokerref:
-            sl.add('brokerref', tp_brokerref)
+            tp.add('brokerref', tp_brokerref)
         if tp_guardtime:
-            sl.add('guardtime', str(tp_guardtime))
+            tp.add('guardtime', str(tp_guardtime))
 
         correction: Union[float, str] = tp_correction
         if correction:
             if not isinstance(correction, float):
                 _ensure_percentage(correction)
-            sl.add('correction', str(correction))
+            tp.add('correction', str(correction))
 
         spread: Union[float, str] = tp_spread
         if spread:
             if not isinstance(spread, float):
                 _ensure_percentage(spread)
-            sl.add('spread', str(spread))
+            tp.add('spread', str(spread))
 
     return mk
 

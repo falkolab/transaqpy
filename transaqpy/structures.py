@@ -146,7 +146,6 @@ class Error(TransaqMessage):
     ROOT_NAME = 'error'
     text = StringField('text()')
 
-
 class ConnectorVersion(TransaqMessage):
     """
     Номер версии коннектора.
@@ -776,7 +775,7 @@ class StopOrder(BaseOrder):
         # Цена исполнения (отменяет bymarket)
         price = FloatField('orderprice')
 
-    stoplosss = NodeField('stoploss', _StopLoss)
+    stoploss = NodeField('stoploss', _StopLoss)
 
     class _TakeProfit(TransaqMessage):
         """Тейк профит ордер секция"""
@@ -805,7 +804,7 @@ class StopOrder(BaseOrder):
         # Количество лотов
         quantity = IntegerField('takeprofit/quantity')
 
-    takeprofit = NodeField('stoploss', _TakeProfit)
+    takeprofit = NodeField('takeprofit', _TakeProfit)
 
 
 class ClientOrderPacket(Packet):
