@@ -37,7 +37,6 @@ class TransaqClient:
     _connected = None
     _recover = False
     _connection_error = None
-    _connected_blocker = False
     _can_disconnect = False
     _connector_initialized = False
 
@@ -80,42 +79,39 @@ class TransaqClient:
         # deferred initialization
         if not self._connector_initialized:
             self._connector.initialize()
-        if self._connected_blocker:
-            logger.warning('You should disconnect before!')
+        if self.is_online:
+            logger.warning('Необходимо сначала отключиться!')
             return False
         response = self.send_command(commands.connect(host, login, password, port, **kwargs))
-        # if not response.success:
-        #     error = response.text if isinstance(response, Error) else 'Unable to connect'
-        #     raise UnableToConnectTransaqClientException(error)
         if not response.success:
             logger.warning(response.text)
             if response.text == 'Соединение уже установлено...':
-                self._connected_blocker = True
                 self._can_disconnect = True
                 logger.warning(response.text)
-                logger.warning('Reconnect ...')
-                self.disconnect()
+                logger.warning('Переподключение ...')
+                self.disconnect(force=True)
                 return self.connect(host, login, password, port, **kwargs)
-        self._connected_blocker = response.success
         return response.success
 
-    def disconnect(self) -> Union[bool, None]:
+    def disconnect(self, force=False) -> Union[bool, None]:
         if not self._can_disconnect:
             return None
-        if not self._connected_blocker:
-            logger.warning('You should connect before!')
+        if not self.is_online and not force:
+            logger.warning('Необходимо сначала подключиться!')
             return False
-        # if self.is_connected:
-            # Если в процессе работы коннектора подключение к серверу будет потеряно
-            # (при этом приходит структура <server_status connected=false/>),
-            # то вызов команды disconnect перед новым подключением с помощью команды connect - не требуется.
+
         response = self.send_command(
             CommandMaker("disconnect")
         )
         if not response.success:
-            logger.warning("Can't disconnect because: %s", response.text)
-        self._can_disconnect = not response.success
-        self._connected_blocker = not response.success
+            logger.warning("Не могу отключиться: %s", response.text)
+            self._can_disconnect = True
+        else:
+            self._can_disconnect = False
+            self._connected = False
+
+        if not self._connected:
+            self._recover = False
         return response.success
 
     def __del__(self):
@@ -130,7 +126,7 @@ class TransaqClient:
         result = self._connector.send_command(command_str)
         logger.debug('Result: %s', result)
         error = Error.parse(result)
-        if error and error.text:
+        if error.text:
             raise TransaqClientException(error.text.encode(encoding))
         else:
             return result_parser.parse(result)
